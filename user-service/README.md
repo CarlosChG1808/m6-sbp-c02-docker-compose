@@ -1,50 +1,31 @@
-### Procedimiento
+## Creación del Dockerfile
 
-- 1.- Cambiar el archivo application.properties a application.yml
-- 2.- Copiar application.yml en el directorio config-repo  
-- 3.- Agregar dependencia Spring Cloud Config Client
+### Generar el JAR del proyecto Spring Boot
+```declarative
+mvn clean package -DskipTests
 ```
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
+- -DskipTests : Omite la ejecución de las pruebas
 
+### Verificar que el JAR se haya creado correctamente
+```declarative  
+ls target/
 ```
+### Verificar que el JAR se ejecute correctamente
+```declarative  
+java -jar target/nombre-del-archivo.jar 
 ```
-        <!-- Spring Cloud Config Client -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
 
+### Crea la imagen
 ```
+docker build -t user-service:1.0 .
 ```
-    <!-- Spring Cloud Dependencies -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+
+### Ejecutar el contenedor
 ```
-- 4.- Agregar dependencia Spring Cloud Bootstrap
+docker run -d -p 8081:8081 --name user-service user-service:1.0
 ```
-   <!-- Spring Cloud Boostrap -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
+
+### Verificar que el contenedor falla porque no existe la base de datos
 ```
-- 5.- Agregar el archivo bootstrap.yml en el directorio src/main/resources
+docker logs -f user-service
 ```
-spring:
-  application:
-    name: user-service
-  cloud:
-    config:
-      uri: http://localhost:8084
-      fail-fast: true
-```
-NO  - 6.- Agregar la anotación @EnableConfigServer en la clase principal
